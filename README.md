@@ -8,10 +8,11 @@ Line風アプリ　～micchan line～
 
 ## ③DEMO
 
-
+https://yusuke1976.github.io/kadai04_new_chat/
 
 ## ④作ったアプリケーション用のIDまたはPasswordがある場合
 
+- API Keyは記述していません
 - ID: 今回はなし
 - PW: 今回はなし
   
