@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line風アプリ</title>
+    <link rel="stylesheet" href="css/samplei.css">
+</head>
+<body>
+
+    <div id="loader">
+        <img src="jpg/logo.jpg">
+    </div>
+
+    <!-- コンテンツ表示画面 -->
+    <div>
+        <div>名前：<input type="text" id="uname"> </div>
+        <div>
+            <textarea id="text" cols="80" rows="7" placeholder="メッセージを入力してください"></textarea>
+            <button id="send">送信</button>
+        </div>
+        <div id="output"></div>
+    </div>
+
+    <!--/ コンテンツ表示画面 -->
+
+    <!-- 以下JavaScript領域 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <!-- 以下Firebase -->
+    <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getDatabase, ref, push, set, update, onChildAdded, remove, onChildRemoved, onChildChanged }
+    from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+    
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "-secret-",
+        authDomain: "-secret-",
+        projectId: "-secret-",
+        storageBucket: "-secret-",
+        messagingSenderId: "-secret-",
+        appId: "-secret-"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app); 
+    const dbRef = ref(db,"chat");
+
+    // ローダー画像を0.5秒表示する
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            document.getElementById('loader').style.display = 'none';
+        }, 900); // 0.9秒（900ミリ秒）後にローダー画像を非表示にする
+    });    
+        
+    send.addEventListener('click', () => {
+    const now = new Date();
+    const nowYear = now.getFullYear(); 
+    const nowMon = ('0' + (now.getMonth() + 1)).slice(-2);
+    const nowDate = ('0' +  now.getDate()).slice(-2);
+    const nowHour = ('0' +  now.getHours()).slice(-2);
+    const nowMinute = ('0' + now.getMinutes()).slice(-2);
+    const nowSecond = ('0' + now.getSeconds()).slice(-2);
+    
+    //ボタンをクリックした時点の日時をコンソールに表示
+    //console.log(`${nowYear}/${nowMon}/${nowDate} ${nowHour}:${nowMinute}`);
+    const time = nowYear+ '/' + nowMon + '/' + nowDate + ' ' + nowHour + ':' + nowMinute + ':' + nowSecond; 
+    
+    //データ登録(Click)
+//    $("#send").on("click",function(){
+        const msg = {
+            uname : $("#uname").val(),
+            text  : $("#text").val(),
+            time
+        }
+        const newPostRef = push(dbRef); //ユニークキーを生成
+        // console.log(datestamp);
+        set(newPostRef,msg);       
+    });
+   
+        
+    //最初にデータ取得＆onSnapshotでリアルタイムにデータを取得
+    onChildAdded(dbRef,function(data){
+        const msg = data.val();
+        const key = data.key; //ユニークKEY
+        // let h = '<div class="message-bubble ' + (msg.uname === $("#uname").val() ? 'sent' : 'received') + '">';
+        let h = '<div class="message-bubble ' + (msg.uname === $("#uname").val() ? 'sent' : 'received') + '" id="msg-' + key + '">';
+        h += '<p>';
+        h += msg.time;
+        h += '<br>';
+        h += msg.uname;            
+        h += '<br>';    
+        h += '<span contentEditable = "true" id="'+key+'_update">'+msg.text+'</span>';
+        // h += msg.text;
+        h += '<br>';
+        h += '<button class="remove" data-key="'+key+'">メッセージ削除</button>'
+        h += '<button class="update" data-key="'+key+'">メッセージ修正</button>'
+        h += '</p>';
+        h += '</div>';
+        $("#output").append(h);
+        $("#output").scrollTop($("#output")[0].scrollHeight);
+
+        // ボタンが押された後に、中身を削除するテクニック🤗
+        $("#uname").val("");
+        $("#text").val("");
+
+    });
+
+    //削除イベント
+    $("#output").on("click",".remove",function(){
+        const key = $(this).attr("data-key");
+        const remove_item = ref(db,"chat/"+key);
+        remove(remove_item);
+    });
+    
+
+    //更新イベント
+    $("#output").on("click",".update",function(){
+        const key = $(this).attr("data-key");
+        update(ref(db,"chat/"+key),{
+            text: $("#"+key+'_update').html()
+        });
+    });
+
+    // メッセージが削除されたときの処理
+    // onChildRemoved(dbRef, (data) => {
+    //     $("#"+data.key).remove();
+    // });
+
+    onChildRemoved(dbRef, (data) => {
+    $("#msg-" + data.key).remove();
+    });
+
+    
+    // onChildChanged(dbRef, (data) => {
+    //     $("#"+data.key+'_update').html(data.val().text);
+    //     $("#"+data.key+'_update').fadeOut(800).fadeIn(800);
+    // });
+
+    
+    //console.log(time);
+    //send.innerText = `初回保存 ${nowYear}/${nowMon}/${nowDate} ${nowHour}:${nowMinute}`;
+//    });
+    
+    //console.log(time); 
+
+    
+    
+    
+    //最初にデータ取得＆onSnapshotでリアルタイムにデータを取得
+    // onChildAdded(dbRef,function(data){
+    //     const msg = data.val();
+    //     const key = data.key; //ユニークKEY
+    //     let h = '<p>';
+    //         h += msg.uname;
+    //         h += '<br>';
+            //h += dete;
+            //h += '<br>';
+    //         h += msg.text;
+    //         h += '</p>';
+    //         $("#output").append(h);
+    // });
+
+</script>
+</body>
+</html>
+
+
+
+

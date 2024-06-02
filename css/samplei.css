@@ -1,0 +1,115 @@
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body {
+    background-color: #f5f5f5;
+    color: #333;
+    padding: 10px;
+}
+.message-bubble {
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 10px 15px;
+    max-width: 70%;
+    margin-bottom: 10px;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#send {
+    background-color: #0bdf55;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+#send:hover {
+    background-color: #ff4d4d;
+}
+
+#output {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    height: 430px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+/* .message-bubble {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    position: relative;
+    word-wrap: break-word;
+} */
+
+.message-bubble::before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+.sent {
+    background-color: #dcf8c6;
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+}
+
+.sent::before {
+    right: -10px;
+    bottom: 0;
+    border-width: 0 10px 10px 0;
+    border-color: transparent transparent #dcf8c6 transparent;
+}
+
+.received {
+    background-color: #e5e5ea;
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+}
+
+.received::before {
+    left: -10px;
+    bottom: 0;
+    border-width: 0 0 10px 10px;
+    border-color: transparent transparent transparent #e5e5ea;
+}
+
+
+#uname{
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
+}
+#text {
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    resize: none;
+    font-size: 15px;
+}
